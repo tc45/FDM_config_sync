@@ -95,7 +95,7 @@ class FDMClient:
         return policy_id
 
     def create_access_rule(self, name):
-        self.log.info(f'Creating access rule {name}.')
+        self.log.info(f'Creating access rule "{name}".')
 
     def get_access_rule_by_name(self, name):
         self.log.debug('Searching for access rule.')
