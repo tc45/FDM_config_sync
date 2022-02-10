@@ -19,7 +19,7 @@ class FDMClient:
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         }
-        self.base_url = f'https://{self.host}:{self.port}/api/fdm/v2'
+        self.base_url = f'https://{self.host}:{self.port}/api/fdm/v5'
 
         requests.packages.urllib3.disable_warnings()
 
@@ -57,7 +57,7 @@ class FDMClient:
             'password': f'{self.password}',
         }
 
-        self.log.debug('Senfing the login request to FDM.')
+        self.log.debug('Sending the login request to FDM.')
         response = self._send_request(url, method='post', body=body)
         self.token = response.get('access_token')
         self.log.debug(f'Access token: {self.token}')
@@ -94,6 +94,9 @@ class FDMClient:
         self.log.debug(f'Policy ID is: {policy_id}')
         return policy_id
 
+    def create_access_rule(self, name):
+        self.log.info(f'Creating access rule {name}.')
+
     def get_access_rule_by_name(self, name):
         self.log.debug('Searching for access rule.')
         policy_id = self.get_access_policy_id()
@@ -111,6 +114,7 @@ class FDMClient:
                 rule_data = rule
                 break
         if rule_data is None:
+            self.create_access_rule(name)
             raise Exception('Unable to find requested rule.')
         return rule_data
 
@@ -118,7 +122,7 @@ class FDMClient:
         self.log.debug('Searching for URL categories on FDM.')
         url = self.base_url + '/object/urlcategories'
         headers = self._get_auth_headers()
-        params = { 'limit': '100' }
+        params = {'limit': '100'}
 
         self.log.debug('Sending request for getting URL categories from FDM.')
         response = self._send_request(url, headers=headers, params=params)
@@ -161,5 +165,5 @@ class FDMClient:
             if not deployed:
                 raise Exception('Error while deploying the configuration.')
         else:
-            raise Exception('Error occured when requesting the '
+            raise Exception('Error occurred when requesting the '
                             'configuration deployment.')
